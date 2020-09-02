@@ -1,32 +1,43 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <defaultNav/>
+    <router-view/>
   </div>
 </template>
 
+<script>
+import defaultNav from '@/components/Nav'
+export default {
+  name: 'App',
+  components:{
+    defaultNav,
+  },
+  mounted: function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+          console.log('location.origin',location.origin);
+          this.$router.replace({ path: redirect.replace(location.origin+this.$router.options.base,'/') });
+        }
+  },
+}
+</script>
+
 <style>
+html,body {
+    min-width: 840px !important;
+    height: 100vh;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  height: 100%;
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.icon {
+  width: 1em; height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
 }
 </style>
