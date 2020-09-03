@@ -7,7 +7,7 @@
           <!--</div>-->
       <!--</div>-->
       <div class="content">
-          <div>Search all beaconsfor allele</div>
+          <div>Search peptide evidences</div>
           <div class="search-wrapper">
             <!-- <Input v-model="keywords" icon="ios-search" placeholder="Search" style="width:100%" @on-enter="addKeyword"/> -->
             <Input v-model="keywords" search placeholder="Search" enter-button="Search" style="width:100%" @on-search="search"/>
@@ -34,12 +34,12 @@
                   <div class="sort">
                         <span class="name">Refine Results:</span>
                         <div class="sortOption">
-                            <Select v-model="facetName" style="width:90px" @on-change="facetNameChange"> 
+                            <Select v-model="facetName" style="width:90px" @on-change="facetNameChange">
                                 <Option v-for="item in facetNameArray" :value="item" :key="item">{{item}}</Option>
                             </Select>
                             <Icon type="ios-arrow-forward" style="font-size: 12px"/>
                             <Select class="facet-value-select" v-model="facetValue" style="width:150px;position: relative;" @on-change="facetValueChange" filterable>
-                                <Option v-for="item in facetValueArray" :value="item.value" :key="item.value">{{ item.value }} ({{item.count}})</Option> 
+                                <Option v-for="item in facetValueArray" :value="item.value" :key="item.value">{{ item.value }} ({{item.count}})</Option>
                             </Select>
                         </div>
                   </div>
@@ -53,26 +53,26 @@
           </div>
           <div class="container-wrapper">
                   <Row :gutter="16">
-                      <Col span="6">
-                          <Card>
-                            <p slot="title"><a class="tool-name">Response (ongoing...)</a></p>
-                            <p>
-                                <CheckboxGroup v-model="social" style="display: flex; flex-direction: column;">
-                                    <Checkbox label="found">
-                                        <span>Found</span>
-                                    </Checkbox>
-                                    <Checkbox label="notfound">
-                                        <span>Not Found</span>
-                                    </Checkbox>
-                                    <Checkbox label="notapplicable">
-                                        <span>Not Applicable</span>
-                                    </Checkbox>
-                                </CheckboxGroup>
-                            </p>
-                            
-                          </Card>
-                      </Col>
-                      <Col span="18">
+<!--                      <Col span="6">-->
+<!--                          <Card>-->
+<!--                            <p slot="title"><a class="tool-name">Response (ongoing...)</a></p>-->
+<!--                            <p>-->
+<!--                                <CheckboxGroup v-model="social" style="display: flex; flex-direction: column;">-->
+<!--                                    <Checkbox label="found">-->
+<!--                                        <span>Found</span>-->
+<!--                                    </Checkbox>-->
+<!--                                    <Checkbox label="notfound">-->
+<!--                                        <span>Not Found</span>-->
+<!--                                    </Checkbox>-->
+<!--                                    <Checkbox label="notapplicable">-->
+<!--                                        <span>Not Applicable</span>-->
+<!--                                    </Checkbox>-->
+<!--                                </CheckboxGroup>-->
+<!--                            </p>-->
+<!--                            -->
+<!--                          </Card>-->
+<!--                      </Col>-->
+                      <Col>
                           <template v-if="dataFound">
                             <Card v-for="item in cardList" class="card" v-bind:key="item.id">
                               <p slot="title"><a class="tool-name" @click="gotoPTMDetails(item.usi)">{{item.peptideSequence}}</a></p>
@@ -86,7 +86,8 @@
                                    <p style="font-weight: bold">Protein Accessions:</p>
                                    <div style="width: 100%">
                                         <Tooltip  v-for="tagItem in item.proteinAccessions" :content="tagItem" placement="top-start">
-                                          <Tag style="width: 140px">
+                                         <Tag>
+                                          <!--                                    <Tag style="width: 140px">-->
                                             {{tagItem}}
                                           </Tag>
                                         </Tooltip>
@@ -116,7 +117,7 @@
                       </Col>
                   </Row>
           </div>
-          
+
       </div>
       <Spin fix v-if="loading"></Spin>
   </div>
@@ -276,7 +277,7 @@ export default {
     //     this.filter = this.filters[index].name;
     //     this.filters[index].type = 'primary';
 
-        
+
     //     if(index == 0){
     //       for(let i in this.filters){
     //           if(i == index){
@@ -341,7 +342,7 @@ export default {
         // }
 
         // this.query.sort_field = this.sortType
-        // this.query.sort_order = this.sortOrder 
+        // this.query.sort_order = this.sortOrder
 
         // this.query.page = this.page
         // this.query.pageSize = this.pageSize
@@ -382,7 +383,7 @@ export default {
                     else{
                       this.dataFound=false;
                     }
-                    
+
                   },function(err){
                       console.log('err',err);
                       this.dataFound=false;
@@ -393,9 +394,9 @@ export default {
                       });
                   });
             },function(err){
-               
+
             });
-        
+
     },
     pageChange(page){
       this.page= page-1;
@@ -446,7 +447,7 @@ export default {
     // facetNameChange(index){
     //   this.facetValueArray = this.facetObj[index]
     //   this.facetValue=''
-    // }, 
+    // },
     // facetValueChange(index){
     //   for(let i in this.tagsArray){
     //     if(this.tagsArray[i].name == this.facetName && this.tagsArray[i].value == index){
