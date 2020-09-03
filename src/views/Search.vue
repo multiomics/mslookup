@@ -83,7 +83,7 @@
                               </p>
                               <div class="card-content-wrapper">
                                 <div class="left">
-                                   <p style="font-weight: bold">Protein Accessions:</p>
+                                   <p style="font-weight: bold">Proteins Mapped:</p>
                                    <div style="width: 100%">
                                         <Tooltip  v-for="tagItem in item.proteinAccessions" :content="tagItem" placement="top-start">
                                          <Tag>
@@ -93,7 +93,7 @@
                                         </Tooltip>
                                    </div>
                                    <!-- <p>{{item.proteinAccessions}}</p> -->
-                                   <p style="font-weight: bold; margin-top: 10px">Gene Accessions:</p>
+                                   <p style="font-weight: bold; margin-top: 10px">Genome Mappings:</p>
                                    <div style="width: 100%">
                                       <Tooltip  v-for="tagItem in item.geneAccessions" :content="tagItem" placement="top-start">
                                           <Tag style="width: 140px">
