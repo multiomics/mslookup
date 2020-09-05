@@ -83,24 +83,23 @@
                               </p>
                               <div class="card-content-wrapper">
                                 <div class="left">
-                                   <p style="font-weight: bold">Protein Accessions:</p>
-                                   <div style="width: 100%">
+
+                                   <div style="font-weight:bold; display: inline-block; width: 144px">Protein Accessions:</div>
+                                   <!-- <div style="width: 100%"> -->
                                         <Tooltip  v-for="tagItem in item.proteinAccessions" :content="tagItem" placement="top-start">
                                           <Tag style="width: 140px">
                                             {{tagItem}}
                                           </Tag>
                                         </Tooltip>
-                                   </div>
-                                   <!-- <p>{{item.proteinAccessions}}</p> -->
-                                   <p style="font-weight: bold; margin-top: 10px">Gene Accessions:</p>
-                                   <div style="width: 100%">
+                                   <!-- </div> -->
+                                   <div style="font-weight:bold; display: inline-block; width: 144px;">Gene Accessions:</div>
+                                   <!-- <div style="width: 100%"> -->
                                       <Tooltip  v-for="tagItem in item.geneAccessions" :content="tagItem" placement="top-start">
                                           <Tag style="width: 140px">
                                             {{tagItem}}
                                           </Tag>
                                       </Tooltip>
-                                   </div>
-                                   <!-- <p>{{item.geneAccessions}}</p> -->
+                                   <!-- </div> -->
                                 </div>
                                <!--  <div class="right">
                                 </div> -->
