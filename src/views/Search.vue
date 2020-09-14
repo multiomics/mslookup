@@ -75,7 +75,7 @@
                       <Col>
                           <template v-if="dataFound">
                             <Card v-for="item in cardList" class="card" v-bind:key="item.id">
-                              <p slot="title"><a class="tool-name" @click="gotoPTMDetails(item.usi)">{{item.peptideSequence}}</a></p>
+                              <p slot="title"><a class="tool-name" @click="gotoPTMDetails(item.usi)">{{item.peptideSequence}} [charge:{{item.charge}}] [precursor m/z:{{item.mz}}]</a> </p>
                               <p style="display: flex" slot="extra">
                                   <!-- <span>
                                       <Icon type="md-cloud-download" size="22"/>
@@ -365,6 +365,8 @@ export default {
                               peptideSequence:res.body[i].peptideSequence,
                               proteinAccessions:res.body[i].proteinAccessions,
                               geneAccessions:res.body[i].geneAccessions,
+                              charge:res.body[i].precursorCharge,
+                              mz:res.body[i].precursorMz,
                             };
                             // for(let j in res.body[i].proteinAccessions){
                             //   item.proteinAccessions+=res.body[i].proteinAccessions[j]+';'
