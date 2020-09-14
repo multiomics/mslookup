@@ -10,7 +10,21 @@
           <div>Search peptide evidences</div>
           <div class="search-wrapper">
             <!-- <Input v-model="keywords" icon="ios-search" placeholder="Search" style="width:100%" @on-enter="addKeyword"/> -->
-            <Input v-model="keywords" search placeholder="Search" enter-button="Search" style="width:100%" @on-search="search"/>
+            <!-- <Input v-model="keywords" search placeholder="Search" enter-button="Search" style="width:100%" @on-search="search"/> -->
+            <Input v-model="keywords" icon="md-return-left" placeholder="peptideSequenceRegex" style="width:100%" @on-enter="addCondition('peptideSequenceRegex',keywords)"/>
+          </div>
+          <div class="facet-wrapper">
+              <div style="display: flex">
+                  <Select v-model="facetType" size="small" style="width:150px;margin-right: 5px;" @on-change="facetChange">
+                      <Option v-for="item in facetList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  </Select>
+                  <Input v-model="facetContent" icon="md-return-left" placeholder="" size="small" @on-enter="addCondition(facetType,facetContent)" style="display: flex;width:250px"/>
+              </div>
+              <Button size="small" type="primary" @click="search">Search</Button>
+          </div>
+          <div class="condition-wrapper">
+            <Tag v-for="item in searchCondtions" type="border" :color="item.value?'primary':'primary'" :key="item.name+item.value" :name="item.name+item.value" closable @on-close="removeConditionTag(item.name,item.value)">{{item.name}}<span v-if="item.value">-></span>{{item.value}}</Tag>
+            <Divider />
           </div>
           <!-- <Divider /> -->
           <!-- <div class="search-options-wrapper">
@@ -48,9 +62,9 @@
                   <Button type="primary" @click="search">Search</Button>
               </div>
           </div> -->
-          <div class="tag-wrapper" style="margin-top: 10px;" >
+          <!-- <div class="tag-wrapper" style="margin-top: 10px;" >
             <Tag v-for="item in tagsArray" type="border" :color="item.value?'warning':'primary'" :key="item.name+item.value" :name="item.name+item.value" closable @on-close="removeFacetTag">{{item.name}}<span v-if="item.value">-></span>{{item.value}}</Tag>
-          </div>
+          </div> -->
           <div class="container-wrapper">
                   <Row :gutter="16">
 <!--                      <Col span="6">-->
@@ -75,7 +89,16 @@
                       <Col>
                           <template v-if="dataFound">
                             <Card v-for="item in cardList" class="card" v-bind:key="item.id">
-                              <p slot="title"><a class="tool-name" @click="gotoPTMDetails(item.usi)">{{item.peptideSequence}} [charge:{{item.charge}}] [precursor m/z:{{item.mz}}]</a> </p>
+                              <p slot="title"><a class="tool-name" @click="gotoPTMDetails(item.usi)">
+                                  <span v-for="sequenceItem in item.peptideSequenceArray">
+                                      <template >
+                                          <!-- <Tooltip :content="sequenceItem" placement="bottom" :transfer="true"> -->
+                                            <span>{{sequenceItem}}</span>
+                                          <!-- </Tooltip> -->
+                                      </template>
+                                      
+                                  </span>
+                              </a></p>
                               <p style="display: flex" slot="extra">
                                   <!-- <span>
                                       <Icon type="md-cloud-download" size="22"/>
@@ -85,7 +108,7 @@
                                 <div class="left">
                                   <div>
                                     <div style="font-weight:bold; display: inline-block; width: 144px">Proteins Mapped:</div>
-                                    <Tooltip  v-for="tagItem in item.proteinAccessions" :content="tagItem" placement="top-start">
+                                    <Tooltip  v-for="tagItem in item.proteinAccessions" :content="tagItem" placement="bottom" :transfer="true">
                                      <Tag style="width: 140px">
                                         {{tagItem}}
                                       </Tag>
@@ -93,7 +116,7 @@
                                   </div>
                                   <div style="margin-top: 10px">
                                     <div style="font-weight:bold; display: inline-block; width: 144px;">Gene Accessions:</div>
-                                    <Tooltip  v-for="tagItem in item.geneAccessions" :content="tagItem" placement="top-start">
+                                    <Tooltip  v-for="tagItem in item.geneAccessions" :content="tagItem" placement="bottom" :transfer="true">
                                         <Tag style="width: 140px">
                                           {{tagItem}}
                                         </Tag>
@@ -124,12 +147,12 @@ export default {
   data () {
     return {
         publicPath: process.env.BASE_URL.replace(/\/$/, ''),
-        keywords:'AAAA*A',
+        keywords:'',
         total:0,
         page:1,
-        pageSize:30,
+        pageSize:100,
         cardList:[],
-        loading:true,
+        loading:false,
         dataFound:false,
         filter:'All',
         resultsTableCol:[
@@ -256,7 +279,33 @@ export default {
         facetValueArray:[],
         facetValue:'',
         facetName:'',
-        tagsArray:[]
+        tagsArray:[],
+        facetType:'ptmValue',
+        facetContent:'',
+        facetList:[
+            {
+                value: 'ptmValue',
+                label: 'ptmValue'
+            },
+            {
+                value: 'proteinAccessions',
+                label: 'proteinAccessions'
+            },
+            {
+                value: 'geneAccessions',
+                label: 'geneAccessions'
+            },
+          ],
+        searchCondtions:[
+            // {
+            //     name: 'test2',
+            //     value: 'test2'
+            // },
+            // {
+            //     name: 'test3',
+            //     value: 'test3'
+            // },
+        ]
     }
   },
   methods:{
@@ -316,9 +365,14 @@ export default {
     //       }*/
     // },
     search(){
-        this.loading=true;
-        this.dataFound=false;
-        this.cardList=[];
+        if(this.searchCondtions.length == 0){
+          this.$Notice.error({
+              title: 'Search Condition Empty',
+              desc: 'Please add one search condition at least'
+          });
+          return
+        }
+        
         // if(this.query.description)
         //   delete this.query.description;
         // if(this.query.id)
@@ -341,18 +395,73 @@ export default {
 
         // this.query.page = this.page
         // this.query.pageSize = this.pageSize
-        this.query.pageSize = 100
-        this.query.peptideSequenceRegex = this.keywords
+        this.body = {}
+        this.body.peptideSequenceRegex=''
+        this.body.ptm = {
+          ptmKey: "name",
+          ptmValue:''
+        }
+        this.body.proteinAccessions=[]
+        this.body.geneAccessions=[]
+
+        console.log(this.searchCondtions)
+        for(let i in this.searchCondtions){
+          if(this.searchCondtions[i].name == 'peptideSequenceRegex' && this.searchCondtions[i].value)
+            this.body.peptideSequenceRegex = this.searchCondtions[i].value
+          
+          else if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value)
+              this.body.proteinAccessions.push(this.searchCondtions[i].value)
+
+          else if(this.searchCondtions[i].name == 'geneAccessions' && this.searchCondtions[i].value)
+              this.body.geneAccessions.push(this.searchCondtions[i].value)
+
+          else if(this.searchCondtions[i].name == 'ptmValue' && this.searchCondtions[i].value)
+              this.body.ptm.ptmValue = this.searchCondtions[i].value
+        }
+        if(!this.body.peptideSequenceRegex){
+            this.$Notice.error({
+                title: 'Condition Error',
+                desc: 'peptideSequenceRegex required'
+            });
+            return
+        }
+        if(!this.body.ptm.ptmValue){
+            this.$Notice.error({
+                title: 'Condition Error',
+                desc: 'ptmValue required'
+            });
+            return
+        }
+        if(this.body.proteinAccessions.length == 0){
+            this.$Notice.error({
+                title: 'Condition Error',
+                desc: 'proteinAccessions required'
+            });
+            return
+        }
+        if(this.body.geneAccessions.length == 0){
+            this.$Notice.error({
+                title: 'Condition Error',
+                desc: 'geneAccessions required'
+            });
+            return
+        }
+        this.query.page = this.page - 1
+        this.query.pageSize = this.pageSize
+        
+        this.loading=true;
+        this.dataFound=false;
+        this.cardList=[];
         this.$http
-            .get(this.$store.state.baseApiURL + 'spectra/findByPepSequence/count',{params:{peptideSequenceRegex:this.keywords}})
+            .get(this.$store.state.baseApiURL + 'spectra/findByPepSequence/count',{params:{peptideSequenceRegex:this.body.peptideSequenceRegex}})
             .then(function(res){
               // this.total = res.body
               this.total = res.body
               this.$http
-                  .get(this.$store.state.baseApiURL + 'spectra/findByPepSequence',{params:this.query})
+                    .post(this.$store.state.baseApiURL + 'spectra/findByGenericRequest',this.body,{params:this.query})
+                    // .get(this.$store.state.baseApiURL + 'spectra/findByPepSequence',{params:{peptideSequenceRegex:this.body.peptideSequenceRegex}})
                   .then(function(res){
                     this.loading=false;
-                    console.log(res.body)
                     let tempLength = res.body.length;
                     if(tempLength > 0){
                         // let limit = res.headers.map.last_page[0].split('&')[0].split('=')[1];
@@ -363,17 +472,13 @@ export default {
                             var item = {
                               usi:res.body[i].usi,
                               peptideSequence:res.body[i].peptideSequence,
+                              peptideSequenceArray:res.body[i].peptideSequence.split(''),
+                              
                               proteinAccessions:res.body[i].proteinAccessions,
                               geneAccessions:res.body[i].geneAccessions,
-                              charge:res.body[i].precursorCharge,
-                              mz:res.body[i].precursorMz,
                             };
-                            // for(let j in res.body[i].proteinAccessions){
-                            //   item.proteinAccessions+=res.body[i].proteinAccessions[j]+';'
-                            // }
-                            // for(let j in res.body[i].geneAccessions){
-                            //   item.geneAccessions+=res.body[i].geneAccessions[j]+';'
-                            // }
+                            /////////////////////
+                            
                             this.cardList.push(item);
                         }
                     }
@@ -395,8 +500,39 @@ export default {
             });
 
     },
+    facetChange(){
+
+    },
+    removeConditionTag(name,value){
+      for(let i in this.searchCondtions){
+        if(this.searchCondtions[i].name == name && this.searchCondtions[i].value == value){
+          this.searchCondtions.splice(i,1)
+          i--
+        }
+      }
+    },
+    addCondition(name,value){
+      if(!value)
+        return
+      let item = {
+        name:name,
+        value:value
+      }
+      for(let i in this.searchCondtions){
+        if(this.searchCondtions[i].name == 'peptideSequenceRegex' && name == 'peptideSequenceRegex'){
+          this.$Notice.error({
+              title: 'Repeated Keywords',
+              desc: 'Only one keywords could be searched'
+          });
+          return
+        }
+      }
+      this.searchCondtions.push(item)
+      this.keywords = ''
+      this.facetContent = ''
+    },
     pageChange(page){
-      this.page= page-1;
+      this.page= page;
       // this.current=page;
       // this.query.offset = parseInt(this.pageSize) * (parseInt(page)-1) + 1;
       // console.log(page,this.pageSize,this.query.offset);
@@ -514,7 +650,7 @@ export default {
     }
   },
   mounted(){
-    this.search();
+     // this.search();
     // this.getFacets();
   }
 }
@@ -546,7 +682,14 @@ function abbreviateNumber(number){
     .search-wrapper{
       width: 100%;
       text-align: center;
-      margin: 20px auto 30px auto;
+      margin: 20px auto 20px auto;
+    }
+    .facet-wrapper{
+      display: flex;
+      justify-content: space-between;
+    }
+    .condition-wrapper{
+      margin: 15px 0; 
     }
     .search-options-wrapper{
       margin: 20px auto 0 auto;
@@ -639,7 +782,7 @@ function abbreviateNumber(number){
       width: 80%;
       margin-right: auto;
       margin-left: auto;
-      padding-top: 60px;
+      padding-top: 40px;
     }
     .card-content-wrapper{
       display: flex;
@@ -672,7 +815,7 @@ function abbreviateNumber(number){
     }
     .tag-wrapper{
       margin-bottom: 5px;
-      display: inline-block;
+      /*display: inline-block;*/
     }
     .card{
       display: inline-block;
