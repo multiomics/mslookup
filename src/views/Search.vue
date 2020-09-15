@@ -91,12 +91,14 @@
                             <Card v-for="item in cardList" class="card" v-bind:key="item.id">
                               <p slot="title"><a class="tool-name" @click="gotoPTMDetails(item.usi)">
                                   <span v-for="sequenceItem in item.peptideSequenceArray">
-                                      <template >
-                                          <!-- <Tooltip :content="sequenceItem" placement="bottom" :transfer="true"> -->
-                                            <span>{{sequenceItem}}</span>
-                                          <!-- </Tooltip> -->
+                                      <template v-if="sequenceItem.name">
+                                          <Tooltip :content="sequenceItem.name" placement="bottom" :transfer="true">
+                                            <span style="color:#f56c6c">{{sequenceItem.value}}</span>
+                                          </Tooltip>
                                       </template>
-                                      
+                                      <template v-else>
+                                          <span>{{sequenceItem.value}}</span>
+                                      </template>
                                   </span>
                               </a></p>
                               <p style="display: flex" slot="extra">
@@ -472,13 +474,48 @@ export default {
                             var item = {
                               usi:res.body[i].usi,
                               peptideSequence:res.body[i].peptideSequence,
-                              peptideSequenceArray:res.body[i].peptideSequence.split(''),
-                              
+                              // peptideSequenceArray:res.body[i].peptideSequence.split(''),
+                              peptideSequenceArray:[],
                               proteinAccessions:res.body[i].proteinAccessions,
                               geneAccessions:res.body[i].geneAccessions,
                             };
                             /////////////////////
+                            let peptideSequenceArrayTemp = res.body[i].peptideSequence.split('')
+                            for(let j in peptideSequenceArrayTemp){
+                              let sequenceItem = {
+                                index:j,
+                                value:peptideSequenceArrayTemp[j],
+                                name:''
+                              }
+                              item.peptideSequenceArray.push(sequenceItem)
+                            }
                             
+                            /////////////////////
+                            let tempArray = []
+                            let modificationsTemp = res.body[i].modifications
+                            if(modificationsTemp.length>0){
+                                for(let j in modificationsTemp){
+                                    let name = modificationsTemp[j].modification.name
+                                    let itemTemp = {}
+                                    itemTemp[name] = []
+                                    let positionMapArray = modificationsTemp[j].positionMap
+                                    for(let k in positionMapArray){
+                                      let positionMapItem = positionMapArray[k]
+                                      itemTemp[name].push(positionMapItem.key) 
+                                    }
+                                    tempArray.push(itemTemp)
+                                }
+                                console.log('tempArray',tempArray)
+                            }
+                            for(let j in tempArray){
+                              for(let k in tempArray[j]){
+                                let indexArray = tempArray[j][k]
+                                for(let m in indexArray){
+                                  let index = indexArray[m]
+                                  item.peptideSequenceArray[index].name = k
+                                }
+                              }
+                            }
                             this.cardList.push(item);
                         }
                     }
