@@ -367,13 +367,7 @@ export default {
     //       }*/
     // },
     search(){
-        if(this.searchCondtions.length == 0){
-          this.$Notice.error({
-              title: 'Search Condition Empty',
-              desc: 'Please add one search condition at least'
-          });
-          return
-        }
+        
         
         // if(this.query.description)
         //   delete this.query.description;
@@ -407,19 +401,42 @@ export default {
         this.body.geneAccessions=[]
 
         console.log(this.searchCondtions)
+        let peptideSequenceRegexFound = false
+        let proteinAccessionsFound = false
+        let geneAccessionsFound = false
+        let ptmValueFound = false
         for(let i in this.searchCondtions){
-          if(this.searchCondtions[i].name == 'peptideSequenceRegex' && this.searchCondtions[i].value)
+          if(this.searchCondtions[i].name == 'peptideSequenceRegex' && this.searchCondtions[i].value){
             this.body.peptideSequenceRegex = this.searchCondtions[i].value
+            peptideSequenceRegexFound = true
+          }
           
-          else if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value)
-              this.body.proteinAccessions.push(this.searchCondtions[i].value)
+          else if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value){
+            this.body.proteinAccessions.push(this.searchCondtions[i].value)
+            proteinAccessionsFound = true
+          }
+              
 
-          else if(this.searchCondtions[i].name == 'geneAccessions' && this.searchCondtions[i].value)
-              this.body.geneAccessions.push(this.searchCondtions[i].value)
+          else if(this.searchCondtions[i].name == 'geneAccessions' && this.searchCondtions[i].value){
+            this.body.geneAccessions.push(this.searchCondtions[i].value)
+            geneAccessionsFound = true
+          }
+              
 
-          else if(this.searchCondtions[i].name == 'ptmValue' && this.searchCondtions[i].value)
-              this.body.ptm.ptmValue = this.searchCondtions[i].value
+          else if(this.searchCondtions[i].name == 'ptmValue' && this.searchCondtions[i].value){
+            this.body.ptm.ptmValue = this.searchCondtions[i].value
+            ptmValueFound = true
+          }  
         }
+        if(!peptideSequenceRegexFound)
+          delete this.body.peptideSequenceRegex
+        if(!proteinAccessionsFound)
+          delete this.body.proteinAccessions
+        if(!geneAccessionsFound)
+          delete this.body.geneAccessions
+        if(!ptmValueFound)
+          delete this.body.ptm
+
         if(!this.body.peptideSequenceRegex){
             this.$Notice.error({
                 title: 'Condition Error',
@@ -427,27 +444,34 @@ export default {
             });
             return
         }
-        if(!this.body.ptm.ptmValue){
-            this.$Notice.error({
-                title: 'Condition Error',
-                desc: 'ptmValue required'
-            });
-            return
-        }
-        if(this.body.proteinAccessions.length == 0){
-            this.$Notice.error({
-                title: 'Condition Error',
-                desc: 'proteinAccessions required'
-            });
-            return
-        }
-        if(this.body.geneAccessions.length == 0){
-            this.$Notice.error({
-                title: 'Condition Error',
-                desc: 'geneAccessions required'
-            });
-            return
-        }
+        // if(!this.body.peptideSequenceRegex){
+        //     this.$Notice.error({
+        //         title: 'Condition Error',
+        //         desc: 'peptideSequenceRegex required'
+        //     });
+        //     return
+        // }
+        // if(!this.body.ptm.ptmValue){
+        //     this.$Notice.error({
+        //         title: 'Condition Error',
+        //         desc: 'ptmValue required'
+        //     });
+        //     return
+        // }
+        // if(this.body.proteinAccessions.length == 0){
+        //     this.$Notice.error({
+        //         title: 'Condition Error',
+        //         desc: 'proteinAccessions required'
+        //     });
+        //     return
+        // }
+        // if(this.body.geneAccessions.length == 0){
+        //     this.$Notice.error({
+        //         title: 'Condition Error',
+        //         desc: 'geneAccessions required'
+        //     });
+        //     return
+        // }
         this.query.page = this.page - 1
         this.query.pageSize = this.pageSize
         
