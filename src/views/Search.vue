@@ -11,7 +11,7 @@
           <div class="search-wrapper">
             <!-- <Input v-model="keywords" icon="ios-search" placeholder="Search" style="width:100%" @on-enter="addKeyword"/> -->
             <!-- <Input v-model="keywords" search placeholder="Search" enter-button="Search" style="width:100%" @on-search="search"/> -->
-            <Input v-model="keywords" icon="md-return-left" placeholder="peptideSequenceRegex" style="width:100%" @on-enter="addCondition('peptideSequenceRegex',keywords)"/>
+            <Input v-model="keywords" placeholder="PeptideSequenceRegex: AAAA*" style="width:100%" @on-enter="search"/>
           </div>
           <div class="facet-wrapper">
               <div style="display: flex">
@@ -102,9 +102,8 @@
                                   </span>
                               </a></p>
                               <p style="display: flex" slot="extra">
-                                  <!-- <span>
-                                      <Icon type="md-cloud-download" size="22"/>
-                                  </span> -->
+                                  <span style="font-weight: bold; margin-right: 2px">Charge:</span><span>{{item.precursorCharge}}</span> <span style="margin:0 5px"> | </span>
+                                  <span style="font-weight: bold; margin-right: 2px">PrecursorMz:</span><span>{{item.precursorMz}}</span>
                               </p>
                               <div class="card-content-wrapper">
                                 <div class="left">
@@ -124,6 +123,18 @@
                                         </Tag>
                                     </Tooltip>
                                   </div>
+                                  <!-- <div style="margin-top: 10px">
+                                    <div style="font-weight:bold; display: inline-block; width: 144px;">Charge:</div>
+                                      <Tag style="width: 140px">
+                                        {{item.precursorCharge}}
+                                      </Tag>
+                                  </div>
+                                  <div style="margin-top: 10px">
+                                    <div style="font-weight:bold; display: inline-block; width: 144px;">PrecursorMz:</div>
+                                      <Tag style="width: 140px">
+                                        {{item.precursorMz}}
+                                      </Tag>
+                                  </div> -->
                                 </div>
                               </div>
                             </Card>
@@ -287,15 +298,15 @@ export default {
         facetList:[
             {
                 value: 'ptmValue',
-                label: 'ptmValue'
+                label: 'Modification'
             },
             {
                 value: 'proteinAccessions',
-                label: 'proteinAccessions'
+                label: 'Protein Accessions'
             },
             {
                 value: 'geneAccessions',
-                label: 'geneAccessions'
+                label: 'Gene Accessions'
             },
           ],
         searchCondtions:[
@@ -392,7 +403,7 @@ export default {
         // this.query.page = this.page
         // this.query.pageSize = this.pageSize
         this.body = {}
-        this.body.peptideSequenceRegex=''
+        this.body.peptideSequenceRegex=this.keywords
         this.body.ptm = {
           ptmKey: "name",
           ptmValue:''
@@ -406,12 +417,12 @@ export default {
         let geneAccessionsFound = false
         let ptmValueFound = false
         for(let i in this.searchCondtions){
-          if(this.searchCondtions[i].name == 'peptideSequenceRegex' && this.searchCondtions[i].value){
-            this.body.peptideSequenceRegex = this.searchCondtions[i].value
-            peptideSequenceRegexFound = true
-          }
+          // if((this.searchCondtions[i].name == 'peptideSequenceRegex' && this.searchCondtions[i].value)|| this.ke){
+          //   this.body.peptideSequenceRegex = this.searchCondtions[i].value
+          //   peptideSequenceRegexFound = true
+          // }
           
-          else if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value){
+          if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value){
             this.body.proteinAccessions.push(this.searchCondtions[i].value)
             proteinAccessionsFound = true
           }
@@ -428,7 +439,7 @@ export default {
             ptmValueFound = true
           }  
         }
-        if(!peptideSequenceRegexFound)
+        if(!this.keywords)
           delete this.body.peptideSequenceRegex
         if(!proteinAccessionsFound)
           delete this.body.proteinAccessions
@@ -437,10 +448,10 @@ export default {
         if(!ptmValueFound)
           delete this.body.ptm
 
-        if(!this.body.peptideSequenceRegex){
+        if(!this.keywords ){
             this.$Notice.error({
                 title: 'Condition Error',
-                desc: 'peptideSequenceRegex required'
+                desc: 'PeptideSequenceRegex required'
             });
             return
         }
@@ -502,6 +513,8 @@ export default {
                               peptideSequenceArray:[],
                               proteinAccessions:res.body[i].proteinAccessions,
                               geneAccessions:res.body[i].geneAccessions,
+                              precursorCharge:res.body[i].precursorCharge,
+                              precursorMz:res.body[i].precursorMz
                             };
                             /////////////////////
                             let peptideSequenceArrayTemp = res.body[i].peptideSequence.split('')
