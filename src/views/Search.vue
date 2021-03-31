@@ -378,8 +378,8 @@ export default {
     //       }*/
     // },
     search(){
-        
-        
+
+
         // if(this.query.description)
         //   delete this.query.description;
         // if(this.query.id)
@@ -421,23 +421,23 @@ export default {
           //   this.body.peptideSequenceRegex = this.searchCondtions[i].value
           //   peptideSequenceRegexFound = true
           // }
-          
+
           if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value){
             this.body.proteinAccessions.push(this.searchCondtions[i].value)
             proteinAccessionsFound = true
           }
-              
+
 
           else if(this.searchCondtions[i].name == 'geneAccessions' && this.searchCondtions[i].value){
             this.body.geneAccessions.push(this.searchCondtions[i].value)
             geneAccessionsFound = true
           }
-              
+
 
           else if(this.searchCondtions[i].name == 'ptmValue' && this.searchCondtions[i].value){
             this.body.ptm.ptmValue = this.searchCondtions[i].value
             ptmValueFound = true
-          }  
+          }
         }
         if(!this.keywords)
           delete this.body.peptideSequenceRegex
@@ -485,7 +485,7 @@ export default {
         // }
         this.query.page = this.page - 1
         this.query.pageSize = this.pageSize
-        
+
         this.loading=true;
         this.dataFound=false;
         this.cardList=[];
@@ -526,7 +526,7 @@ export default {
                               }
                               item.peptideSequenceArray.push(sequenceItem)
                             }
-                            
+
                             /////////////////////
                             let tempArray = []
                             let modificationsTemp = res.body[i].modifications
@@ -538,7 +538,7 @@ export default {
                                     let positionMapArray = modificationsTemp[j].positionMap
                                     for(let k in positionMapArray){
                                       let positionMapItem = positionMapArray[k]
-                                      itemTemp[name].push(positionMapItem.key) 
+                                      itemTemp[name].push(positionMapItem.key)
                                     }
                                     tempArray.push(itemTemp)
                                 }
@@ -620,7 +620,7 @@ export default {
     gotoPTMDetails(usi){
       //this.$router.push({name:'dataset',params:{id:id}});
       //this.$router.push({name:'tools',params:{id:id}});
-      window.open('http://ipsa.multiomics.info/?usi='+usi)
+      window.open('http://sviewer.multiomics.info/?usi='+usi)
     },
     // getFacets(){
     //     this.$http
@@ -763,7 +763,7 @@ function abbreviateNumber(number){
       justify-content: space-between;
     }
     .condition-wrapper{
-      margin: 15px 0; 
+      margin: 15px 0;
     }
     .search-options-wrapper{
       margin: 20px auto 0 auto;
