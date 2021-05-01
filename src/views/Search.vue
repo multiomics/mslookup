@@ -378,8 +378,8 @@ export default {
     //       }*/
     // },
     search(){
-        
-        
+
+
         // if(this.query.description)
         //   delete this.query.description;
         // if(this.query.id)
@@ -421,23 +421,23 @@ export default {
           //   this.body.peptideSequenceRegex = this.searchCondtions[i].value
           //   peptideSequenceRegexFound = true
           // }
-          
+
           if(this.searchCondtions[i].name == 'proteinAccessions' && this.searchCondtions[i].value){
             this.body.proteinAccessions.push(this.searchCondtions[i].value)
             proteinAccessionsFound = true
           }
-              
+
 
           else if(this.searchCondtions[i].name == 'geneAccessions' && this.searchCondtions[i].value){
             this.body.geneAccessions.push(this.searchCondtions[i].value)
             geneAccessionsFound = true
           }
-              
+
 
           else if(this.searchCondtions[i].name == 'ptmValue' && this.searchCondtions[i].value){
             this.body.ptm.ptmValue = this.searchCondtions[i].value
             ptmValueFound = true
-          }  
+          }
         }
         if(!this.keywords)
           delete this.body.peptideSequenceRegex
@@ -485,7 +485,7 @@ export default {
         // }
         this.query.page = this.page - 1
         this.query.pageSize = this.pageSize
-        
+
         this.loading=true;
         this.dataFound=false;
         this.cardList=[];
@@ -508,16 +508,16 @@ export default {
                         for(let i=0; i<tempLength; i++){
                             var item = {
                               usi:res.body[i].usi,
-                              peptideSequence:res.body[i].peptideSequence,
-                              // peptideSequenceArray:res.body[i].peptideSequence.split(''),
+                              peptideSequence:res.body[i].pepSequence,
+                              // peptideSequenceArray:res.body[i].pepSequence.split(''),
                               peptideSequenceArray:[],
                               proteinAccessions:res.body[i].proteinAccessions,
                               geneAccessions:res.body[i].geneAccessions,
                               precursorCharge:res.body[i].precursorCharge,
-                              precursorMz:res.body[i].precursorMz
+                              precursorMz:Math.round((res.body[i].precursorMz + Number.EPSILON) * 1000) / 1000
                             };
                             /////////////////////
-                            let peptideSequenceArrayTemp = res.body[i].peptideSequence.split('')
+                            let peptideSequenceArrayTemp = res.body[i].pepSequence.split('')
                             for(let j in peptideSequenceArrayTemp){
                               let sequenceItem = {
                                 index:j,
@@ -526,7 +526,7 @@ export default {
                               }
                               item.peptideSequenceArray.push(sequenceItem)
                             }
-                            
+
                             /////////////////////
                             let tempArray = []
                             let modificationsTemp = res.body[i].modifications
@@ -538,7 +538,7 @@ export default {
                                     let positionMapArray = modificationsTemp[j].positionMap
                                     for(let k in positionMapArray){
                                       let positionMapItem = positionMapArray[k]
-                                      itemTemp[name].push(positionMapItem.key) 
+                                      itemTemp[name].push(positionMapItem.key)
                                     }
                                     tempArray.push(itemTemp)
                                 }
@@ -620,7 +620,8 @@ export default {
     gotoPTMDetails(usi){
       //this.$router.push({name:'dataset',params:{id:id}});
       //this.$router.push({name:'tools',params:{id:id}});
-      window.open('https://sviewer.multiomics.info/?usi='+usi)
+      window.open('http://sviewer.multiomics.info/?usi='+usi+'&fragment_tol=10&fragment_tol_unit=ppm&matching_tol=10&matching_tol_unit=ppm&ce_bottom=29')
+
     },
     // getFacets(){
     //     this.$http
@@ -763,7 +764,7 @@ function abbreviateNumber(number){
       justify-content: space-between;
     }
     .condition-wrapper{
-      margin: 15px 0; 
+      margin: 15px 0;
     }
     .search-options-wrapper{
       margin: 20px auto 0 auto;
