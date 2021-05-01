@@ -620,7 +620,7 @@ export default {
     gotoPTMDetails(usi){
       //this.$router.push({name:'dataset',params:{id:id}});
       //this.$router.push({name:'tools',params:{id:id}});
-      window.open('http://ipsa.multiomics.info/?usi='+usi)
+      window.open('https://sviewer.multiomics.info/?usi='+usi)
     },
     // getFacets(){
     //     this.$http

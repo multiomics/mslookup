@@ -11,6 +11,11 @@ export default new Router({
       name: 'search',
       component: () => import(/* webpackChunkName: "editor" */ './views/Search.vue')
     },
+    {
+      path: '/spectrum',
+      name: 'spectrum',
+      component: () => import(/* webpackChunkName: "editor" */ './views/Spectrum.vue')
+    },
     // {
     //   path: '/',
     //   redirect: to => {
